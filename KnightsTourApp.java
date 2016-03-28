@@ -9,12 +9,15 @@ import java.io.*; // for reader and other io classes
 public class KnightsTourApp {
 	public static void main(String[] args) throws IOException {
 		int size = 0;
-	
+		int position = 0;
+		
 		// get size of board
 		System.out.print("Enter board size (8 for 8x8 board) ");
 		size = Integer.parseInt(getString());
 		System.out.println("Enter the beginning square (1 to "+size+"):");
-		Board knightsTourBoard = new Board(size);	
+		position = Integer.parseInt(getString());
+		Board knightsTourBoard = new Board(position);	
+		knightsTourBoard.getPath(position);
 	}  // end method main()
 	
 	public static String getString() throws IOException {
