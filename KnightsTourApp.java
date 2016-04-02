@@ -7,6 +7,9 @@
 import java.io.*; // for reader and other io classes
 
 public class KnightsTourApp {
+	Board knightsTourBoard;
+	int position;
+	
 	public static void main(String[] args) throws IOException {
 		int size = 0;
 		int position = 0;
@@ -49,4 +52,13 @@ public class KnightsTourApp {
 		return Integer.parseInt(s);
 	} // end method:getInt
 	
+	public void printOutput () {
+		if (knightsTourBoard.getSuccess() ) {
+			System.out.println("SUCCESS:");
+		} else {
+			System.out.println("FAILURE:");
+		}
+		System.out.println("Total Number of Moves="+knightsTourBoard.movesCount);
+		System.out.println("Moving Sequence: "+knightsTourBoard.boardStack);
+	}
 } // end class KnightsTourApp
