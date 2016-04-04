@@ -7,20 +7,21 @@
 import java.io.*; // for reader and other io classes
 
 public class KnightsTourApp {
-	Board knightsTourBoard;
 	int position;
 	
 	public static void main(String[] args) throws IOException {
 		int size = 0;
 		int position = 0;
-		
+		int squared = 0;
 		// get size of board
 		System.out.print("Enter board size (8 for 8x8 board) ");
 		size = Integer.parseInt(getString());
-		System.out.println("Enter the beginning square (1 to "+size+"):");
+		squared = size*size;
+		System.out.println("Enter the beginning square (1 to "+squared+"):");
 		position = Integer.parseInt(getString());
-		Board knightsTourBoard = new Board(position);	
+		Board knightsTourBoard = new Board(size);	
 		knightsTourBoard.getPath(position);
+		knightsTourBoard.printOutput();
 	}  // end method main()
 	
 	public static String getString() throws IOException {
@@ -40,7 +41,7 @@ public class KnightsTourApp {
 			} // end if
 			outStr = outStr + str + "\n";
 		} // end while
-	} // end mtehod:getText()
+	} // end method:getText()
 
 	public static char getChar() throws IOException {
 		String s = getString();
@@ -52,13 +53,6 @@ public class KnightsTourApp {
 		return Integer.parseInt(s);
 	} // end method:getInt
 	
-	public void printOutput () {
-		if (knightsTourBoard.getSuccess() ) {
-			System.out.println("SUCCESS:");
-		} else {
-			System.out.println("FAILURE:");
-		}
-		System.out.println("Total Number of Moves="+knightsTourBoard.movesCount);
-		System.out.println("Moving Sequence: "+knightsTourBoard.boardStack);
-	}
+
+	
 } // end class KnightsTourApp

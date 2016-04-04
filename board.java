@@ -15,63 +15,89 @@
 //			if the size less than 1, then the board setup failed, output failure for the board
 //			otherwise stack is between 2 and size^2)-2, pop the stack and mark the popped item as exhausted (no further available paths from there), mark as not on the path
 // 		if a position succeeds, push next position to the stack, mark item on top of stack as being on current path
-//loop to start of loop
+// loop to start of loop
+//
+// Note: There is a discrepancy between array numbers and position numbers for the spaces on the board
+// Array numbers are numbered 0-63 for 8x8 board
+// boolean arrays of goodPosNotOnCurrentPath and goodPosNotExhausted will be numbered as arrays (just like normal)
+//
+// Position numbers are numbered 1-64 for 8x8 board
+// Sizes will generally be in terms of position numbers
+//
+//
 
 import java.util.*; // for Stack class
+import java.util.Scanner; // for scanner class
 
 public class Board {
 	Stack<Integer> boardStack = new Stack<Integer>();
 	private boolean[] goodPosNotOnCurrentPath; // reads as good position, not on current path
 	private boolean[] goodPosNotExhausted; // reads as good position, not exhausted. This means there are other paths to explore from this position
 	private int size;
-	private boolean done = true;
+	private boolean notDone = true;
 	int movesCount = 0;
+	int squared = 0;
 	private boolean success = false; // true indicates a solution was found, while false indicates no solution found 
 	private static int[][] possibleMoves =
 		{ {+1,+2},{+2,+1},{+2,-1},{+1,-2},{-1,-2},{-2,-1},{-2,+1},{-1,+2} };
 	// changed from original to follow clock pattern of numbers, for easier, more intuitive, debugging
 	
 	public Board(int dimension) { // constructor
+		size = dimension;
 		// initialize boolean values to be "good" to use
-		for (int i = 0; i<dimension; i++) {
+		squared = (size*size); // number of squares on the board, so the size of the array 
+		goodPosNotOnCurrentPath = new boolean[squared];
+		goodPosNotExhausted = new boolean[squared];
+		for (int i = 0; i<convertPosToArray(squared)+1; i++) {
+			System.out.println("i="+i);; //debugging output
 			goodPosNotOnCurrentPath[i] = true;
 			goodPosNotExhausted[i] = true;
 		} // end for 
 	} // end constructor
 
 	public Stack<Integer> getPath(int position) {
+		System.out.println("Starting method: getPath"); // debugging output
 		int poppedItem = 0;
 		boardStack.push(position);
-		while (!done) { // not done
+		System.out.println("notDone=" + notDone); // debugging output
+		System.out.println("boardStack=" + boardStack); // debugging output		
+		while (notDone) {
 			int nextPos = getNextPos(boardStack.peek());
+			System.out.println("nextPos=" + nextPos); // debugging output
 			if (nextPos == -1) { // failed to find moves from current position
-				if (boardStack.size() > (size^2)-2) { // success, every position was reached!
+				System.out.println("Failed for find moves from current position"); // debugging output
+				if (boardStack.size() >= squared) { // success, every position was reached!
+					System.out.println("Success, every position reached since "); // debugging output
+					System.out.println("boardStack.size()=" + boardStack.size() + " squared=" + squared); // debugging output
 					success = true; // since a solution was found
-					done = true; // with a success, we are done
+					notDone = false; // with a success, we are done
 					return boardStack;
 				} else if (boardStack.size() < 1) { // failure, down to first position with no moves
 					success = false; // since no solution was found
-					done = true; // with a failure, we are done
+					notDone = false; // with a failure, we are done
 					Stack<Integer> emptyStack = new Stack<Integer>(); // make an empty stack
 					boardStack = emptyStack;
 				} else { // stack size between 2 and (size^2)-2 which means we are in the middle but have run out of moves
 					movesCount++;
 					poppedItem = boardStack.pop();
-					goodPosNotExhausted[poppedItem]=false;
-					goodPosNotOnCurrentPath[poppedItem]=true;	
-				}	
+					goodPosNotExhausted[convertPosToArray(poppedItem)]=true;
+					goodPosNotOnCurrentPath[convertPosToArray(poppedItem)]=true;	
+				} // end else	
 			} else { // found a valid move
+				System.out.println("Found a move @ nextPos=" + nextPos);
 				boardStack.push(nextPos); // put found nextPos onto the stack
-				goodPosNotOnCurrentPath[nextPos] = false; // pushed item is now on the current path		
-			}
-		}
+				goodPosNotOnCurrentPath[nextPos] = false; // pushed item is now on the current path
+				System.out.println("boardStack=" + boardStack); // debugging output
+			} // end else
+		} // end while
 		// debugging output, in case we manage to get out of the while loop without succeeding or failing
 		Stack<Integer> errorStack = new Stack<Integer>(); // make an empty stack for errors
 		errorStack.push(-1);
 		return errorStack;
-	}
+	} // end method: getPath
 	
 	public int getNextPos(int currentPosition) { // picks next possible
+		System.out.println("starting method: getNextPos"); // debugging output
 		int cycle = 0;
 		while(cycle < 8) { // move
 			int dx = possibleMoves[cycle][0]; // get move in
@@ -86,6 +112,7 @@ public class Board {
 				int nextPos	 = x + y*size + 1; // (x,y) to j
 				if(checkPosition(nextPos)) { // usable position?
 					// yes
+					System.out.println("Found position: " + nextPos); // debugging output
 					return nextPos; // found a move
 				} // end if(knightsTourBoard...
 			} // end if(x>=0...)
@@ -95,7 +122,7 @@ public class Board {
 	} // end getNextPos()
 	
 	public boolean checkPosition (int position) {
-		if ((goodPosNotOnCurrentPath[position] == true) && (goodPosNotExhausted[position] == true)) {
+		if ((goodPosNotOnCurrentPath[convertPosToArray(position)]) && (goodPosNotExhausted[convertPosToArray(position)])) {
 			return true;
 		} else {
 			return false;
@@ -104,5 +131,36 @@ public class Board {
 	
 	public boolean getSuccess () {
 		return success;
-	}
+	} // end method: checkPosition
+	
+	public void printOutput () {
+		if (getSuccess() ) {
+			System.out.println("SUCCESS:");
+		} else {
+			System.out.println("FAILURE:");
+		}
+		System.out.println("Total Number of Moves="+movesCount);
+		System.out.println("Moving Sequence: "+boardStack);
+		System.out.println();
+	} // end method: printOutput
+	
+	//While many can argue that this method is not necessary, I needed some help keeping things organized mentally
+	public int convertPosToArray (int position) {
+		int array = position - 1; 
+		return array;
+	} // end method: convertPosToArray
+
+	//While many can argue that this method is not necessary, I needed some help keeping things organized mentally
+	public int convertArrayToPos (int array) {
+		int position = array + 1;
+		return position;
+	} // end method: convertArrayToPos	
+	
+	public static void enterToContinue() {
+		Scanner pressEnter;
+		System.out.print("Press the enter key to continue");
+		pressEnter = new Scanner(System.in);
+		pressEnter.nextLine();
+		pressEnter.close();
+	} // end method enterToContinue
 } // end class Board
