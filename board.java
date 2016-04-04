@@ -27,7 +27,6 @@
 //
 
 import java.util.*; // for Stack class
-import java.util.Scanner; // for scanner class
 
 public class Board {
 	Stack<Integer> boardStack = new Stack<Integer>();
@@ -62,22 +61,25 @@ public class Board {
 		System.out.println("notDone=" + notDone); // debugging output
 		System.out.println("boardStack=" + boardStack); // debugging output		
 		while (notDone) {
+			pressAnyKey(); // debugging pause to prevent fast looping and overscrolling
 			int nextPos = getNextPos(boardStack.peek());
 			System.out.println("nextPos=" + nextPos); // debugging output
 			if (nextPos == -1) { // failed to find moves from current position
 				System.out.println("Failed for find moves from current position"); // debugging output
+				System.out.println("boardStack.size()="+boardStack.size()); // debugging output
 				if (boardStack.size() >= squared) { // success, every position was reached!
-					System.out.println("Success, every position reached since "); // debugging output
-					System.out.println("boardStack.size()=" + boardStack.size() + " squared=" + squared); // debugging output
+					System.out.println("Success, every position reached since boardStack>="+squared); // debugging output
 					success = true; // since a solution was found
 					notDone = false; // with a success, we are done
 					return boardStack;
 				} else if (boardStack.size() < 1) { // failure, down to first position with no moves
+					System.out.println("Failure since down to first position with no moves"); // debugging output
 					success = false; // since no solution was found
 					notDone = false; // with a failure, we are done
 					Stack<Integer> emptyStack = new Stack<Integer>(); // make an empty stack
 					boardStack = emptyStack;
 				} else { // stack size between 2 and (size^2)-2 which means we are in the middle but have run out of moves
+					System.out.println("Backtrack since in the middle with no moves."); // debugging output
 					movesCount++;
 					poppedItem = boardStack.pop();
 					goodPosNotExhausted[convertPosToArray(poppedItem)]=true;
@@ -139,8 +141,8 @@ public class Board {
 		} else {
 			System.out.println("FAILURE:");
 		}
-		System.out.println("Total Number of Moves="+movesCount);
-		System.out.println("Moving Sequence: "+boardStack);
+		System.out.println("Total Number of Moves=" + movesCount);
+		System.out.println("Moving Sequence: " + boardStack);
 		System.out.println();
 	} // end method: printOutput
 	
@@ -156,11 +158,14 @@ public class Board {
 		return position;
 	} // end method: convertArrayToPos	
 	
-	public static void enterToContinue() {
-		Scanner pressEnter;
-		System.out.print("Press the enter key to continue");
-		pressEnter = new Scanner(System.in);
-		pressEnter.nextLine();
-		pressEnter.close();
-	} // end method enterToContinue
+	 private void pressAnyKey() { 
+	        System.out.println("Press any key to continue...");
+	        try {  System.in.read(); }  
+	        catch(Exception e) {}
+	        System.out.println();
+	 } // end method: pressAnyKey
+	 
+	 private void outputVariables () {
+		 System.out.println("");
+	 }
 } // end class Board
