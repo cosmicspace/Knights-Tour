@@ -52,27 +52,25 @@ public class Board {
 			goodPosNotOnCurrentPath[i] = true;
 			goodPosNotExhausted[i] = true;
 		} // end for 
-		outputVariables();
 	} // end constructor
 
 	public Stack<Integer> getPath(int position) {
 		System.out.println("Starting method: getPath"); // debugging output
 		int poppedItem = 0;
 		boardStack.push(position);
-		goodPosNotOnCurrentPath[convertPosToArray(1)]=false;
-		outputVariables();	
+		System.out.println("notDone=" + notDone); // debugging output
+		System.out.println("boardStack=" + boardStack); // debugging output		
 		while (notDone) {
-			System.out.println("beginning while statement");
+			pressAnyKey(); // debugging pause to prevent fast looping and overscrolling
 			int nextPos = getNextPos(boardStack.peek());
 			System.out.println("nextPos=" + nextPos); // debugging output
 			if (nextPos == -1) { // failed to find moves from current position
 				System.out.println("Failed for find moves from current position"); // debugging output
-				outputVariables(); // debugging output
+				System.out.println("boardStack.size()="+boardStack.size()); // debugging output
 				if (boardStack.size() >= squared) { // success, every position was reached!
-					System.out.println("Success, every position reached since boardStack>=" + squared); // debugging output
+					System.out.println("Success, every position reached since boardStack>="+squared); // debugging output
 					success = true; // since a solution was found
 					notDone = false; // with a success, we are done
-					outputVariables();
 					return boardStack;
 				} else if (boardStack.size() < 1) { // failure, down to first position with no moves
 					System.out.println("Failure since down to first position with no moves"); // debugging output
@@ -80,22 +78,18 @@ public class Board {
 					notDone = false; // with a failure, we are done
 					Stack<Integer> emptyStack = new Stack<Integer>(); // make an empty stack
 					boardStack = emptyStack;
-					outputVariables(); // debugging output
-					return boardStack;
 				} else { // stack size between 2 and (size^2)-2 which means we are in the middle but have run out of moves
-					// so we will backtrack
 					System.out.println("Backtrack since in the middle with no moves."); // debugging output
+					movesCount++;
 					poppedItem = boardStack.pop();
-					goodPosNotExhausted[convertPosToArray(poppedItem)]=false;
-					goodPosNotOnCurrentPath[convertPosToArray(poppedItem)]=true;
-					outputVariables();
+					goodPosNotExhausted[convertPosToArray(poppedItem)]=true;
+					goodPosNotOnCurrentPath[convertPosToArray(poppedItem)]=true;	
 				} // end else	
 			} else { // found a valid move
 				System.out.println("Found a move @ nextPos=" + nextPos);
-				movesCount++;
 				boardStack.push(nextPos); // put found nextPos onto the stack
-				goodPosNotOnCurrentPath[convertPosToArray(nextPos)] = false; // pushed item is now on the current path
-				outputVariables();
+				goodPosNotOnCurrentPath[nextPos] = false; // pushed item is now on the current path
+				System.out.println("boardStack=" + boardStack); // debugging output
 			} // end else
 		} // end while
 		// debugging output, in case we manage to get out of the while loop without succeeding or failing
@@ -117,7 +111,7 @@ public class Board {
 			cycle++; // used this move
 			if(x>=0 && x<size && y>=0 && y<size) { // on the board?
 				// yes
-				int nextPos	= x + y*size + 1; // (x,y) to j
+				int nextPos	 = x + y*size + 1; // (x,y) to j
 				if(checkPosition(nextPos)) { // usable position?
 					// yes
 					System.out.println("Found position: " + nextPos); // debugging output
@@ -164,29 +158,14 @@ public class Board {
 		return position;
 	} // end method: convertArrayToPos	
 	
-	private void pressAnyKey() { 
-		System.out.println("Press any key to continue...");
-		try {  System.in.read(); }  
-		catch(Exception e) {}
-		System.out.println();
-	} // end method: pressAnyKey
-	
-	private void outputVariables () {
-		System.out.println("> boardStack=" + boardStack + "     boardStack.size()=" + boardStack.size());
-		System.out.println("> size=" + size + "    squared=" + squared  +"     movesCount=" + movesCount);
-		System.out.println("> notDone=" + notDone+"    success=" + success);
-		System.out.print("> goodPosNotOnCurrentPath=");
-		for (int i = 0; i<convertPosToArray(squared)+1; i++) {
-			//System.out.println("i="+i);; //debugging output
-			System.out.print(goodPosNotOnCurrentPath[i] + "  ");
-		} // end for
-		System.out.println();
-		System.out.print("> goodPosNotExhausted=");
-		for (int i = 0; i<convertPosToArray(squared)+1; i++) {
-			//System.out.println("i="+i);; //debugging output
-			System.out.print(goodPosNotExhausted[i]+"  ");
-		} // end for
-		System.out.println();
-		pressAnyKey();
-	}
+	 private void pressAnyKey() { 
+	        System.out.println("Press any key to continue...");
+	        try {  System.in.read(); }  
+	        catch(Exception e) {}
+	        System.out.println();
+	 } // end method: pressAnyKey
+	 
+	 private void outputVariables () {
+		 System.out.println("");
+	 }
 } // end class Board
