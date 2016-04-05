@@ -19,8 +19,10 @@ public class KnightsTourApp {
 		squared = size*size;
 		System.out.println("Enter the beginning square (1 to "+squared+"):");
 		position = Integer.parseInt(getString());
-		Board knightsTourBoard = new Board(size);	
+		Board knightsTourBoard = new Board(size);
+                while(knightsTourBoard.pos != -1){
 		knightsTourBoard.getPath(position);
+                }
 		knightsTourBoard.printOutput();
 	}  // end method main()
 	
