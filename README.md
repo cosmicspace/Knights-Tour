@@ -52,56 +52,7 @@ Sample code from assignment pdf: "
 
 What do we need for this?
 
-BASIC ALGORITHM
----------------------------
-get board size and starting position
-put starting position on stack
-start loop
- 		check next positions from current position
-		if all next positions fail, check stack size
- 			if the stack size greater than (size^2)-2, then success! every position was reached (maybe check each position is on the current path as a backup). output the path
-			if the size less than 1, then the board setup failed, output failure for the board
-			otherwise stack is 2 to (size^2)-2, pop the stack and mark the popped item as exhausted (no further available paths from there), mark as not on the path
- 		if a position succeeds, push next position to the stack, mark item on top of stack as being on current path
-loop to start of loop
-
-CLASSES
----------------------------
-KnightsTourApp, need to get info first and then create knights tour board
-Board
-
-KnightsTourApp VARIABLES
----------------------------
-Size
-Position
-
-Board VARIABLES
----------------------------
-size
-NOT NEEDED: current position, integer, ranges from 1-size^2. this variable will merely be a peek (look a the top entry) of the stack
-next position, integer, ranges from 1-size^2
-array of booleans to track positions that are off limits for the current path goodPosNotOnCurrentPath
-array of booleans to track positions that have been exhausted of possibilities goodPosNotExhausted
-stack (array) of size^2 
-position integer (will range from 1-size^2)
-movesQty 
-
-KnightsTourApp VARIABLES
----------------------------
-get input
-get string
-get text
-get int
-get char
-
-Board METHODS
----------------------------
-check position for being a valid move
-get next position
-convert position to xy: convertPostoXY
-convert xy to position: convertXYtoPos
-printStack for debugging
-printBooleans for debugging
+...
 
 TEST CASES
 ---------------------------
