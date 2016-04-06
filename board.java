@@ -5,110 +5,74 @@
 //
 
 public class Board {
-	private int[] solutionPath;
 	private boolean[] goodPosNotOnCurrentPath; // reads as good position, not on current path
 	private boolean[] goodPosNotExhausted; // reads as good position, not exhausted. This means there are other paths to explore from this position
-	private int size;
-	int movesCount = 0;
-	int squared = 0;
+	private int[] solutionPath; // array to hold solution path
+	private int size; // size of the chess board, of size*size 
+	int movesCount = 0; // running count of moves made
+	int squared = 0; // square of size, for simplicity
 	private boolean success = false; // true indicates a solution was found, while false indicates no solution found 
 	private static int[][] possibleMoves =
 		{ {+1,+2},{+2,+1},{+2,-1},{+1,-2},{-1,-2},{-2,-1},{-2,+1},{-1,+2} };
+	// 2D array of potential knight moves
 	// changed from original to follow clock pattern of numbers, for easier, more intuitive, debugging
 	
 	public Board(int dimension) { // constructor
-		int[] solutionPath = new int[squared];
 		size = dimension;
-		// initialize boolean values to be "good" to use
-		squared = (size*size); // number of squares on the board, so the size of the array 
-		goodPosNotOnCurrentPath = new boolean[squared];
+		squared = (size*size); // number of squares on the board, so the size of the array
+ 		goodPosNotOnCurrentPath = new boolean[squared];
 		goodPosNotExhausted = new boolean[squared];
-		for (int i = 0; i<convertPosToArray(squared)+1; i++) {
-			System.out.println("i="+i);; //debugging output
+		solutionPath = new int[squared];
+
+		// initialize array values to be "good" to use
+		for (int i = 0; i < ( (convertPosToArray(squared)) + 1 ); i++) {
 			goodPosNotOnCurrentPath[i] = true;
 			goodPosNotExhausted[i] = true;
-			// outputArrays(); // debugging output
-		} // end for 
-	} // end constructor
+			solutionPath[i] = 0;
+		} // end for
+} // end constructor
 
 	public void getPath(int currentPosition) {
 		// recursive function to find knights tour path
 		// base case: path failure of reaching a point where we have no further moves
-		
-		System.out.println("Starting method: getPath from position:" + currentPosition); // debugging output
-		pressAnyKey();
-		
+		//outputArrays();
 		int nextPosition = -1;
 		goodPosNotOnCurrentPath[convertPosToArray(currentPosition)] = false;
-		outputArrays(); // debugging output
-		nextPosition = getNextPos(currentPosition);
-		System.out.println("nextPosition=" + nextPosition); // debugging output
-		if (nextPosition == -1) { // failure to find a valid new position
-			// do nothing, ending recursion as a base case
-			
-			//output path info for debugging
-			System.out.print("Reached dead end with solutionPath=");
-			for (int i=0; i<squared; i++) {
-				System.out.print(solutionPath[i] + " ");
-			}
-			System.out.println();
-			
-		} else { // found a move, so continue recursion
-			System.out.println("Found a move, continuing recursion");
-			movesCount++;
-			System.out.println("movesCount=" + movesCount);// debugging output
-			getPath(nextPosition);
-			goodPosNotExhausted[convertPosToArray(currentPosition)] = false;
-			goodPosNotOnCurrentPath[convertPosToArray(currentPosition)] = true;
-			outputArrays(); // debugging output
-			solutionPath = insertPosition(solutionPath, currentPosition); // add position to the beginning of the array
-			
-			//output path info for debugging
-			System.out.print("solutionPath=");
-			for (int i=0; i<squared; i++) {
-				System.out.print(solutionPath[i] + " ");
-			}
-			System.out.println();
-		} // end if
-	}
-	
-	public int[] insertPosition(int[] array, int number) { // add position to the beginning of the array
-		for (int i=array.length; i<=1; i--) {
-			array[i-1]=array[i-2];
-		} // end for loop
-		array[0]=number;
-		return array;
-	}
 
-	public int getNextPos(int currentPosition) { // picks next possible
-		System.out.println("starting method: getNextPos=" + currentPosition); // debugging output
 		int cycle = 0;
 		while(cycle < 8) { // move
-			int dx = possibleMoves[cycle][0]; // get move in
-			 int dy = possibleMoves[cycle][1]; // (x,y) format
-			int x = (currentPosition-1)%size; // translate from j
-			int y = (currentPosition-1)/size; // to (x,y) format
-			x = x + dx; // add move to
-			y = y + dy; // position
+			// get move in (x,y) format
+			int dx = possibleMoves[cycle][0];
+			int dy = possibleMoves[cycle][1];
+			// translate from h to (x,y) format
+			int x = (convertPosToArray(currentPosition)) % size;
+			int y = (convertPosToArray(currentPosition)) / size;
+			// add move to position
+			x = x + dx;
+			y = y + dy;
 			cycle++; // used this move
-			if(x>=0 && x<size && y>=0 && y<size) { // on the board?
+			if(x >= 0 && x < size && y >= 0 && y < size) { // on the board?
 				// yes
-				int nextPos	= x + y*size + 1; // (x,y) to j
-				if(checkPosition(nextPos)) { // usable position?
+				// (x,y) to j
+				nextPosition = x + y*size + 1;
+				if(checkPosition(nextPosition)) { // usable position?
+					System.out.println("Found usable position at " + nextPosition);
 					// yes
-					System.out.println("Found position: " + nextPos); // debugging output
-					return nextPos; // found a move
-				} // end if(knightsTourBoard...
+					movesCount++;
+					goodPosNotExhausted[convertPosToArray(currentPosition)] = false;
+					goodPosNotOnCurrentPath[convertPosToArray(currentPosition)] = true;
+					getPath(nextPosition); // found a move
+					for (int i= solutionPath.length; i<=1; i--) {
+						solutionPath[i-1] = solutionPath[i-2];
+					} // end for loop
+					solutionPath[0] = currentPosition;
+				} // end if
 			} // end if(x>=0...)
-		} // end while // no possible move		
-		cycle = 0; // reset move index
-		return -1; // failure
-	} // end getNextPos()
-	
+		} // end while	
+	} // end method: getPath
+
 	public boolean checkPosition (int position) {
-		System.out.println("Checking position:" + position);
 		if ( (goodPosNotOnCurrentPath[convertPosToArray(position)]) && goodPosNotExhausted[convertPosToArray(position)] ) {
-			outputArrays();
 			return true;
 		} else {
 			return false; }
@@ -116,7 +80,7 @@ public class Board {
 	
 	public boolean getSuccess () {
 		return success;
-	} // end method: checkPosition
+	} // end method: getSuccess
 	
 	public void printOutput () {
 		if (getSuccess() ) {
@@ -125,7 +89,11 @@ public class Board {
 			System.out.println("FAILURE:");
 		}
 		System.out.println("Total Number of Moves=" + movesCount);
-		System.out.println("Moving Sequence: " + solutionPath);
+		System.out.print("Moving Sequence: ");
+		for (int i=0; i<squared; i++) {
+			System.out.print(solutionPath[i] + " ");
+		}
+		System.out.println();
 		System.out.println();
 	} // end method: printOutput
 	
@@ -141,24 +109,31 @@ public class Board {
 		return position;
 	} // end method: convertArrayToPos	
 	
-	public void pressAnyKey() { 
-		System.out.println("Press any key to continue...");
+	public void pressEnter() { 
+		System.out.println("Press enter to continue...");
 		try {  System.in.read(); }  
 		catch(Exception e) {}
 		System.out.println();
 	} // end method: pressAnyKey
 	
 	public void outputArrays () { // debugging output
-		System.out.print("goodPosNotOnPath=");
+		System.out.print("> goodPosNotOnPath=");
 		for (int i=0; i<squared; i++) {
 			System.out.print(goodPosNotOnCurrentPath[i] + " ");
 		}
 		System.out.println();
-		System.out.print("goodPosNotExhausted=");
+		
+		System.out.print("> goodPosNotExhausted=");
 		for (int i=0; i<squared; i++) {
 			System.out.print(goodPosNotExhausted[i] + " ");
 		}
 		System.out.println();
-
+		
+		System.out.print("> solutionPath=");
+		for (int i=0; i<squared; i++) {
+			System.out.print(solutionPath[i] + " ");
+		}
+		System.out.println();
+		pressEnter(); // debugging pause
 	}
 } // end class Board
